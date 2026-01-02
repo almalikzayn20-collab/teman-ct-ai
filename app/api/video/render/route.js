@@ -62,3 +62,11 @@ export async function POST(req) {
     );
   }
 }
+export async function GET() {
+  return NextResponse.json({
+    status: "ok",
+    endpoint: "/api/video/render",
+    method: "POST",
+    note: "Use POST with JSON body to render video",
+  });
+}
