@@ -2,23 +2,24 @@ import Link from "next/link";
 
 export default function StudioLayout({ children }) {
   return (
-    <div className="flex h-screen">
-      <aside className="w-64 bg-neutral-900 p-4 space-y-4">
-        <h1 className="font-bold text-xl">CT Studio</h1>
+    <div className="flex min-h-screen">
+      {/* Sidebar */}
+      <aside className="w-64 bg-gray-900 text-white p-4">
+        <h2 className="text-xl font-bold mb-4">🎬 Studio</h2>
 
-        <nav className="space-y-2">
-          <Link href="/studio" className="block text-neutral-300 hover:text-white">
+        <nav className="flex flex-col gap-2">
+          <Link href="/studio" className="hover:underline">
             Dashboard
           </Link>
-          <Link href="/ct-generate" className="block text-neutral-300 hover:text-white">
-            CT Generate
+
+          <Link href="/studio/video" className="hover:underline">
+            Video Tool
           </Link>
         </nav>
       </aside>
 
-      <main className="flex-1 p-8 overflow-y-auto">
-        {children}
-      </main>
+      {/* Content */}
+      <main className="flex-1 bg-white">{children}</main>
     </div>
   );
 }
