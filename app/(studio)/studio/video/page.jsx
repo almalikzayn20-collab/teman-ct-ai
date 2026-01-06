@@ -25,6 +25,9 @@ export default function VideoToolPage() {
     setError(null);
     setResult(null);
 
+    // ============================
+    // BASIC VALIDATION
+    // ============================
     if (!title.trim()) {
       setError("Title is required");
       return;
@@ -33,8 +36,11 @@ export default function VideoToolPage() {
     let parsedScenes;
     try {
       parsedScenes = JSON.parse(scenes);
+      if (!Array.isArray(parsedScenes) || parsedScenes.length === 0) {
+        throw new Error();
+      }
     } catch {
-      setError("Scenes JSON is invalid");
+      setError("Scenes must be a valid non-empty JSON array");
       return;
     }
 
@@ -54,7 +60,25 @@ export default function VideoToolPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Render failed");
 
-      setResult(data);
+      // ============================
+      // SAVE JOB TO localStorage
+      // ============================
+      const job = {
+        ...data,
+        title,
+        scenesCount: parsedScenes.length,
+        createdAt: Date.now(),
+      };
+
+      const existing =
+        JSON.parse(localStorage.getItem("video_jobs")) || [];
+
+      localStorage.setItem(
+        "video_jobs",
+        JSON.stringify([job, ...existing])
+      );
+
+      setResult(job);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -128,7 +152,9 @@ export default function VideoToolPage() {
       {/* RESULT CARD */}
       {result && (
         <div className="bg-gray-900 text-green-200 rounded-xl p-5 text-sm overflow-auto">
-          <div className="mb-2 text-gray-400">Render Result</div>
+          <div className="mb-2 text-gray-400">
+            Render Result (Saved to Jobs)
+          </div>
           <pre>{JSON.stringify(result, null, 2)}</pre>
         </div>
       )}
