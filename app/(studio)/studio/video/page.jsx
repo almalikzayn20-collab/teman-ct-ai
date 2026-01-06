@@ -43,9 +43,7 @@ export default function VideoToolPage() {
     try {
       const res = await fetch("/api/video/render", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
           scenes: parsedScenes,
@@ -54,10 +52,7 @@ export default function VideoToolPage() {
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Render failed");
-      }
+      if (!res.ok) throw new Error(data.error || "Render failed");
 
       setResult(data);
     } catch (err) {
@@ -68,56 +63,74 @@ export default function VideoToolPage() {
   }
 
   return (
-    <div className="p-6 max-w-3xl">
-      <h1 className="text-2xl font-bold mb-4">🎬 Video Generator</h1>
-
-      {/* TITLE */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">
-          Video Title
-        </label>
-        <input
-          className="w-full border rounded p-2"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="My AI Video"
-        />
+    <div className="max-w-4xl mx-auto p-6 space-y-6">
+      {/* HEADER */}
+      <div>
+        <h1 className="text-3xl font-bold">🎬 Video Generator</h1>
+        <p className="text-gray-500 text-sm">
+          Generate mock video render jobs using JSON scenes
+        </p>
       </div>
 
-      {/* SCENES */}
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">
-          Scenes (JSON)
-        </label>
-        <textarea
-          className="w-full border rounded p-2 font-mono text-sm"
-          rows={8}
-          value={scenes}
-          onChange={(e) => setScenes(e.target.value)}
-        />
-      </div>
-
-      {/* BUTTON */}
-      <button
-        onClick={handleSubmit}
-        disabled={loading}
-        className="bg-black text-white px-4 py-2 rounded disabled:opacity-60"
-      >
-        {loading ? "Rendering..." : "Render Video"}
-      </button>
-
-      {/* ERROR */}
-      {error && (
-        <div className="mt-4 text-red-600 text-sm">
-          ❌ {error}
+      {/* FORM CARD */}
+      <div className="bg-white border rounded-xl p-6 space-y-5 shadow-sm">
+        {/* TITLE */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Video Title
+          </label>
+          <input
+            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="My AI Video"
+          />
         </div>
-      )}
 
-      {/* RESULT */}
+        {/* SCENES */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Scenes (JSON)
+          </label>
+          <textarea
+            className="w-full border rounded-lg px-3 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            rows={9}
+            value={scenes}
+            onChange={(e) => setScenes(e.target.value)}
+          />
+        </div>
+
+        {/* ACTION */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="bg-black text-white px-5 py-2 rounded-lg text-sm disabled:opacity-60"
+          >
+            {loading ? "Rendering..." : "Render Video"}
+          </button>
+
+          {loading && (
+            <span className="text-sm text-gray-500">
+              Sending request…
+            </span>
+          )}
+        </div>
+
+        {/* ERROR */}
+        {error && (
+          <div className="text-sm text-red-600 border border-red-200 bg-red-50 rounded-lg p-3">
+            ❌ {error}
+          </div>
+        )}
+      </div>
+
+      {/* RESULT CARD */}
       {result && (
-        <pre className="mt-4 bg-gray-100 p-3 rounded text-sm overflow-auto">
-          {JSON.stringify(result, null, 2)}
-        </pre>
+        <div className="bg-gray-900 text-green-200 rounded-xl p-5 text-sm overflow-auto">
+          <div className="mb-2 text-gray-400">Render Result</div>
+          <pre>{JSON.stringify(result, null, 2)}</pre>
+        </div>
       )}
     </div>
   );
