@@ -1,17 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState([]);
+  const router = useRouter();
 
   // ============================
-  // LOAD JOBS
+  // LOAD JOBS (SAFE)
   // ============================
   function loadJobs() {
-    const stored = JSON.parse(localStorage.getItem("video_jobs")) || [];
+    let stored = [];
 
-    // MOCK STATUS UPDATE (auto progress)
+    try {
+      stored = JSON.parse(localStorage.getItem("video_jobs")) || [];
+    } catch {
+      stored = [];
+    }
+
+    // MOCK STATUS UPDATE (AUTO PROGRESS)
     const updated = stored.map((job) => {
       if (job.status === "queued") {
         return { ...job, status: "processing" };
@@ -32,15 +40,13 @@ export default function JobsPage() {
   useEffect(() => {
     loadJobs(); // first load
 
-    const interval = setInterval(() => {
-      loadJobs();
-    }, 5000); // 5 detik
-
+    const interval = setInterval(loadJobs, 5000);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-6">
+      {/* HEADER */}
       <div>
         <h1 className="text-3xl font-bold">📂 Render Jobs</h1>
         <p className="text-gray-500 text-sm">
@@ -48,15 +54,11 @@ export default function JobsPage() {
         </p>
       </div>
 
+      {/* TABLE */}
       <div className="bg-white border rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-100">
-            <tr
-  key={job.jobId}
-  onClick={() => window.location.href = `/studio/jobs/${job.jobId}`}
-  className="border-t hover:bg-gray-50 cursor-pointer"
->
-
+            <tr>
               <th className="text-left p-3">Title</th>
               <th className="text-left p-3">Scenes</th>
               <th className="text-left p-3">Engine</th>
@@ -68,8 +70,8 @@ export default function JobsPage() {
             {jobs.length === 0 && (
               <tr>
                 <td
-                  colSpan="4"
-                  className="p-4 text-center text-gray-500"
+                  colSpan={4}
+                  className="p-6 text-center text-gray-500"
                 >
                   No render jobs yet
                 </td>
@@ -79,11 +81,20 @@ export default function JobsPage() {
             {jobs.map((job) => (
               <tr
                 key={job.jobId}
-                className="border-t hover:bg-gray-50"
+                onClick={() =>
+                  router.push(`/studio/jobs/${job.jobId}`)
+                }
+                className="border-t hover:bg-gray-50 cursor-pointer transition"
               >
-                <td className="p-3 font-medium">{job.title}</td>
-                <td className="p-3">{job.scenesCount}</td>
-                <td className="p-3">{job.engine}</td>
+                <td className="p-3 font-medium">
+                  {job.title}
+                </td>
+                <td className="p-3">
+                  {job.scenesCount}
+                </td>
+                <td className="p-3">
+                  {job.engine}
+                </td>
                 <td className="p-3">
                   <StatusBadge status={job.status} />
                 </td>
