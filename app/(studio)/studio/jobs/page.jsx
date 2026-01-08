@@ -51,7 +51,12 @@ export default function JobsPage() {
       <div className="bg-white border rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-100">
-            <tr>
+            <tr
+  key={job.jobId}
+  onClick={() => window.location.href = `/studio/jobs/${job.jobId}`}
+  className="border-t hover:bg-gray-50 cursor-pointer"
+>
+
               <th className="text-left p-3">Title</th>
               <th className="text-left p-3">Scenes</th>
               <th className="text-left p-3">Engine</th>
