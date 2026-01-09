@@ -1,11 +1,11 @@
-import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
 
 export async function POST(req) {
   try {
-    const { prompt } = await req.json();
+    const body = await req.json();
 
-    if (!prompt) {
+    if (!body || !body.prompt) {
       return NextResponse.json(
         { error: "Prompt required" },
         { status: 400 }
@@ -14,16 +14,23 @@ export async function POST(req) {
 
     const { data, error } = await supabase
       .from("video_jobs")
-      .insert([{ prompt }])
+      .insert([{ prompt: body.prompt }])
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("SUPABASE ERROR:", error);
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({ job: data });
   } catch (err) {
+    console.error("API ERROR:", err);
     return NextResponse.json(
-      { error: err.message },
+      { error: err.message || "Server error" },
       { status: 500 }
     );
   }
