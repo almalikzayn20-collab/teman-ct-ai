@@ -5,7 +5,7 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    if (!body || !body.prompt) {
+    if (!body?.prompt) {
       return NextResponse.json(
         { error: "Prompt required" },
         { status: 400 }
@@ -30,7 +30,7 @@ export async function POST(req) {
   } catch (err) {
     console.error("API ERROR:", err);
     return NextResponse.json(
-      { error: err.message || "Server error" },
+      { error: err.message },
       { status: 500 }
     );
   }
